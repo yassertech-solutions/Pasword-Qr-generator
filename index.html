@@ -1,0 +1,530 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#020817">
+<title>YASSER TECH QR & PASSWORD STUDIO</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800&family=Poppins:wght@300;400;600;700&display=swap');
+
+:root{--blue:#00bfff;--bg:#020817}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:#eaf8ff;font-family:Poppins,sans-serif;min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;z-index:-2;background:radial-gradient(circle at 20% 20%,#003b7060,transparent 35%),radial-gradient(circle at 80% 80%,#004cff35,transparent 40%)}
+#matrix{position:fixed;inset:0;z-index:-1;opacity:.16;pointer-events:none}
+h1,h2,.brand{font-family:Orbitron,sans-serif}
+.brand{color:var(--blue);text-shadow:0 0 15px var(--blue);letter-spacing:2px}
+button{border:0;cursor:pointer;font-family:inherit}
+
+/* WELCOME */
+#welcome{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.welcome-card{width:100%;max-width:460px;padding:35px 24px;text-align:center;border:1px solid #00bfff80;border-radius:24px;background:#061326ed;box-shadow:0 0 35px #0077ff35;animation:appear 1s ease}
+
+/* PROFILE PICTURE */
+.logo{
+  width:100px;
+  height:100px;
+  object-fit:cover;
+  border:2px solid var(--blue);
+  border-radius:50%;
+  display:block;
+  margin:0 auto 20px;
+  background:#061326;
+  box-shadow:0 0 20px var(--blue),0 0 35px #0077ff80;
+  animation:profileGlow 2s infinite alternate;
+}
+@keyframes profileGlow{
+  from{box-shadow:0 0 12px var(--blue)}
+  to{box-shadow:0 0 30px var(--blue),0 0 45px #0077ff}
+}
+
+.welcome-card h1{font-size:clamp(20px,5vw,29px);margin-bottom:12px}
+.welcome-card p{color:#a8c9dc;font-size:13px;line-height:1.8;margin-bottom:20px}
+.btn{display:block;width:100%;padding:14px;border-radius:12px;background:linear-gradient(90deg,#0077ff,#00c8ff);color:white;font-weight:700;margin-top:13px;text-decoration:none}
+.btn.secondary{background:#10263d;border:1px solid var(--blue)}
+.small{font-size:11px!important;color:#7fa7c0!important;margin-top:18px}
+
+/* MAIN */
+#main{display:none;max-width:1000px;margin:auto;padding:15px 15px 45px}
+header{text-align:center;padding:25px 10px}
+header h1{font-size:clamp(21px,5vw,32px)}
+header p{color:#8cb7d1;font-size:12px;margin-top:10px}
+.clock{text-align:center;color:var(--blue);font-family:Orbitron,sans-serif;font-size:12px;margin:5px 0 20px}
+
+/* MUSIC */
+.music-box{background:#06182b;border:1px solid #008dff77;border-radius:18px;padding:15px;text-align:center;margin-bottom:22px}
+.music-title{font:600 12px Orbitron;color:var(--blue)}
+.waves{height:45px;display:flex;align-items:center;justify-content:center;gap:5px;margin:10px 0}
+.waves span{width:5px;height:8px;border-radius:10px;background:var(--blue);box-shadow:0 0 10px var(--blue);animation:wave .8s ease-in-out infinite alternate;animation-play-state:paused}
+.waves.playing span{animation-play-state:running}
+.waves span:nth-child(2n){animation-delay:.2s}
+.waves span:nth-child(3n){animation-delay:.4s}
+.waves span:nth-child(4n){animation-delay:.1s}
+@keyframes wave{to{height:42px}}
+.music-btn{background:#0077ff;color:white;padding:10px 24px;border-radius:30px;font-weight:700}
+
+/* CATEGORIES */
+.category-title{font:600 11px Orbitron;color:#8cb7d1;letter-spacing:2px;margin-bottom:12px}
+.categories{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:22px}
+.category{background:#081629;border:1px solid #17618d;border-radius:14px;padding:17px 8px;color:#9ecde5;text-align:center;transition:.25s}
+.category .symbol{font-size:25px;display:block;margin-bottom:7px}
+.category strong{font:600 11px Orbitron}
+.category.active{background:linear-gradient(145deg,#07345c,#07172b);border-color:var(--blue);color:#fff;box-shadow:0 0 18px #00bfff40}
+.category.active .symbol{filter:drop-shadow(0 0 8px var(--blue))}
+
+/* PANELS */
+.panel{background:linear-gradient(145deg,#0a2038,#04101f);border:1px solid #087bc766;border-radius:18px;padding:22px;box-shadow:0 0 20px #0077ff12;animation:fade .3s ease}
+.panel h2{font-size:17px;color:var(--blue);margin-bottom:18px}
+label{display:block;font-size:12px;color:#a8c9dc;margin:13px 0 7px}
+input,select,textarea{width:100%;padding:12px;border-radius:9px;outline:none;border:1px solid #17618d;background:#020d1c;color:white;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 10px #00bfff44}
+.action{display:block;width:100%;padding:13px;border-radius:10px;background:linear-gradient(90deg,#0077ff,#00c8ff);color:white;font-weight:700;margin-top:17px}
+#qrcode{display:inline-block;background:white;padding:12px;border-radius:10px;margin-top:15px}
+#qrcode img,#qrcode canvas{display:block;max-width:100%;height:auto}
+.output{text-align:center;overflow-wrap:anywhere}
+.download{display:none;background:#00a8ff;color:white;padding:11px 18px;border-radius:9px;margin:15px auto 0}
+.password-result{background:#020b16;border:1px solid var(--blue);border-radius:10px;padding:15px;font-family:monospace;overflow-wrap:anywhere;color:#00eaff;margin-top:15px;min-height:45px}
+.options{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;margin:12px 0}
+.options label{display:flex;align-items:center;gap:5px;margin:0}
+.options input{width:auto}
+.copy-btn{background:#087bc7;color:white;padding:11px 18px;border-radius:9px;margin-top:10px}
+.hidden{display:none!important}
+footer{text-align:center;color:#6489a4;font-size:11px;padding:35px 10px}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes appear{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.shard{position:fixed;width:5px;height:5px;border:1px solid #62dfff;pointer-events:none;z-index:9999;animation:shatter .7s ease-out forwards}
+@keyframes shatter{to{transform:translate(var(--x),var(--y)) rotate(240deg) scale(.2);opacity:0}}
+@media(max-width:450px){#main{padding:10px}.panel{padding:17px}.categories{gap:8px}.category{padding:14px 5px}}
+</style>
+</head>
+
+<body>
+
+<canvas id="matrix"></canvas>
+
+<!-- BACKGROUND MUSIC -->
+<audio id="bgMusic" autoplay loop playsinline preload="auto">
+<source src="https://files.catbox.moe/uj3vuz.mp3" type="audio/mpeg">
+</audio>
+
+<!-- WELCOME PAGE -->
+<section id="welcome">
+<div class="welcome-card">
+
+<!-- PROFILE PICTURE ONLY ON WELCOME PAGE -->
+<img
+src="https://files.catbox.moe/bfw6od"
+alt="YASSER TECH PROFILE"
+class="logo"
+onerror="this.style.display='none'"
+>
+
+<h1 class="brand">YASSER TECH</h1>
+<p>QR & PASSWORD STUDIO</p>
+<p>WELCOME TO THE CYBER BLUE EXPERIENCE.<br>Follow our official WhatsApp Channel to continue.</p>
+
+<a href="https://whatsapp.com/channel/0029VbD1QcaGk1FkH9XpvD3X" target="_blank" rel="noopener" class="btn">
+⚡ FOLLOW WHATSAPP CHANNEL
+</a>
+
+<button class="btn secondary" onclick="enterStudio()">
+I HAVE FOLLOWED — ENTER
+</button>
+
+<p class="small">POWERED BY YASSER TECH SOLUTIONS<br>FOLLOWING IS SELF-CONFIRMED</p>
+</div>
+</section>
+
+<!-- MAIN PAGE -->
+<main id="main">
+
+<header>
+<h1 class="brand">YASSER TECH</h1>
+<p>QR CODE & PASSWORD GENERATOR STUDIO</p>
+</header>
+
+<div class="clock" id="clock"></div>
+
+<!-- MUSIC PLAYER -->
+<section class="music-box">
+<div class="music-title">♫ YTS CYBER MUSIC PLAYER ♫</div>
+
+<div class="waves" id="waves">
+<span></span><span></span><span></span><span></span><span></span>
+<span></span><span></span><span></span><span></span><span></span>
+<span></span><span></span><span></span><span></span><span></span>
+<span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<p id="musicStatus" style="font-size:11px;color:#8cb7d1;margin-bottom:12px">MUSIC READY</p>
+<button class="music-btn" id="musicBtn" onclick="toggleMusic()">▶ MUSIC ON</button>
+</section>
+
+<!-- CATEGORY NAVIGATION -->
+<div class="category-title">SELECT YOUR TOOL</div>
+
+<nav class="categories">
+<button class="category active" id="qrTab" onclick="showCategory('qr')">
+<span class="symbol">▣</span>
+<strong>QR GENERATOR</strong>
+</button>
+
+<button class="category" id="passTab" onclick="showCategory('password')">
+<span class="symbol">⌘</span>
+<strong>PASSWORD GENERATOR</strong>
+</button>
+</nav>
+
+<!-- QR GENERATOR -->
+<section class="panel" id="qrPage">
+<h2>▣ QR CODE GENERATOR</h2>
+
+<label>QR Code Type</label>
+<select id="qrType" onchange="changeQRType()">
+<option value="url">Website URL</option>
+<option value="text">Plain Text</option>
+<option value="whatsapp">WhatsApp Number</option>
+<option value="wifi">Wi-Fi Details</option>
+</select>
+
+<div id="qrFields">
+<label>Website URL</label>
+<input id="qrInput" placeholder="https://example.com">
+</div>
+
+<label>QR Color</label>
+<input type="color" id="qrColor" value="#000000">
+
+<label>Background Color</label>
+<input type="color" id="qrBg" value="#ffffff">
+
+<button class="action" onclick="generateQR()">GENERATE QR CODE</button>
+
+<div class="output">
+<div id="qrcode"></div>
+<button class="download" id="downloadQR" onclick="downloadQR()">DOWNLOAD QR PNG</button>
+</div>
+</section>
+
+<!-- PASSWORD GENERATOR -->
+<section class="panel hidden" id="passwordPage">
+<h2>⌘ PASSWORD GENERATOR</h2>
+
+<label>Password Length (8–64)</label>
+<input type="number" id="passLength" value="16" min="8" max="64">
+
+<div class="options">
+<label><input type="checkbox" id="upper" checked> Uppercase</label>
+<label><input type="checkbox" id="lower" checked> Lowercase</label>
+<label><input type="checkbox" id="numbers" checked> Numbers</label>
+<label><input type="checkbox" id="symbols" checked> Symbols</label>
+</div>
+
+<button class="action" onclick="generatePassword()">GENERATE PASSWORD</button>
+
+<div class="password-result" id="passwordResult">YOUR PASSWORD WILL APPEAR HERE</div>
+
+<p id="strength" style="font-size:11px;color:#8cb7d1;margin-top:10px">PASSWORD STRENGTH</p>
+
+<button class="copy-btn" onclick="copyPassword()">COPY PASSWORD</button>
+</section>
+
+<footer>
+© 2026 YASSER TECH SOLUTIONS<br>
+ALL RIGHTS RESERVED
+</footer>
+
+</main>
+
+<script>
+/* MATRIX BACKGROUND */
+const canvas=document.getElementById("matrix");
+const ctx=canvas.getContext("2d");
+let drops=[];
+
+function resizeMatrix(){
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+drops=Array(Math.floor(canvas.width/18)).fill(1);
+}
+resizeMatrix();
+addEventListener("resize",resizeMatrix);
+
+function drawMatrix(){
+ctx.fillStyle="rgba(2,8,23,0.12)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="#00aaff";
+ctx.font="14px monospace";
+drops.forEach((y,i)=>{
+ctx.fillText(Math.random()>.5?"1":"0",i*18,y*18);
+if(y*18>canvas.height&&Math.random()>.975)drops[i]=0;
+drops[i]++;
+});
+}
+setInterval(drawMatrix,55);
+
+/* ELEMENTS */
+const music=document.getElementById("bgMusic");
+const musicBtn=document.getElementById("musicBtn");
+const musicStatus=document.getElementById("musicStatus");
+const waves=document.getElementById("waves");
+const welcome=document.getElementById("welcome");
+const main=document.getElementById("main");
+const qrPage=document.getElementById("qrPage");
+const passwordPage=document.getElementById("passwordPage");
+const qrTab=document.getElementById("qrTab");
+const passTab=document.getElementById("passTab");
+const qrType=document.getElementById("qrType");
+const qrFields=document.getElementById("qrFields");
+const qrcode=document.getElementById("qrcode");
+const downloadQRBtn=document.getElementById("downloadQR");
+const qrColor=document.getElementById("qrColor");
+const qrBg=document.getElementById("qrBg");
+const passLength=document.getElementById("passLength");
+const upper=document.getElementById("upper");
+const lower=document.getElementById("lower");
+const numbers=document.getElementById("numbers");
+const symbols=document.getElementById("symbols");
+const passwordResult=document.getElementById("passwordResult");
+const strength=document.getElementById("strength");
+
+let musicPlaying=false;
+
+/* MUSIC AUTO PLAY */
+async function autoPlayMusic(){
+try{
+await music.play();
+musicPlaying=true;
+musicBtn.textContent="Ⅱ MUSIC OFF";
+musicStatus.textContent="♫ NOW PLAYING";
+waves.classList.add("playing");
+}catch(error){
+musicPlaying=false;
+musicStatus.textContent="TAP SCREEN TO START MUSIC";
+musicBtn.textContent="▶ MUSIC ON";
+waves.classList.remove("playing");
+}
+}
+
+window.addEventListener("load",autoPlayMusic);
+
+/* Retry after first user interaction if browser blocked autoplay */
+function retryMusic(){
+if(!musicPlaying)autoPlayMusic();
+}
+["click","touchstart"].forEach(event=>{
+document.addEventListener(event,retryMusic,{once:true,passive:true});
+});
+
+function pauseMusic(){
+music.pause();
+musicPlaying=false;
+musicBtn.textContent="▶ MUSIC ON";
+musicStatus.textContent="MUSIC PAUSED";
+waves.classList.remove("playing");
+}
+
+function toggleMusic(){
+if(musicPlaying){
+pauseMusic();
+}else{
+autoPlayMusic();
+}
+}
+
+music.addEventListener("error",()=>{
+musicStatus.textContent="MUSIC LINK UNAVAILABLE";
+});
+
+/* ENTER MAIN PAGE */
+function enterStudio(){
+welcome.style.display="none";
+main.style.display="block";
+window.scrollTo(0,0);
+if(!musicPlaying)autoPlayMusic();
+}
+
+/* CATEGORY SWITCH */
+function showCategory(category){
+const isQR=category==="qr";
+qrPage.classList.toggle("hidden",!isQR);
+passwordPage.classList.toggle("hidden",isQR);
+qrTab.classList.toggle("active",isQR);
+passTab.classList.toggle("active",!isQR);
+window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* TANZANIA CLOCK */
+function updateClock(){
+const now=new Date();
+const date=new Intl.DateTimeFormat("en-GB",{
+timeZone:"Africa/Dar_es_Salaam",
+weekday:"long",day:"2-digit",month:"long",year:"numeric"
+}).format(now);
+const time=new Intl.DateTimeFormat("en-GB",{
+timeZone:"Africa/Dar_es_Salaam",
+hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false
+}).format(now);
+document.getElementById("clock").textContent=date.toUpperCase()+" | "+time;
+}
+updateClock();
+setInterval(updateClock,1000);
+
+/* QR TYPE */
+function changeQRType(){
+const type=qrType.value;
+
+if(type==="url"){
+qrFields.innerHTML='<label>Website URL</label><input id="qrInput" placeholder="https://example.com">';
+}
+if(type==="text"){
+qrFields.innerHTML='<label>Your Text</label><textarea id="qrInput" placeholder="Enter your text"></textarea>';
+}
+if(type==="whatsapp"){
+qrFields.innerHTML='<label>Phone Number (with country code)</label><input id="qrInput" placeholder="2557XXXXXXXX"><label>Optional Message</label><input id="qrMessage" placeholder="Hello!">';
+}
+if(type==="wifi"){
+qrFields.innerHTML='<label>Wi-Fi Network Name</label><input id="wifiName" placeholder="WiFi Name"><label>Wi-Fi Password</label><input id="wifiPassword" placeholder="Password"><label>Security</label><select id="wifiSecurity"><option value="WPA">WPA/WPA2</option><option value="WEP">WEP</option><option value="nopass">No Password</option></select>';
+}
+
+qrcode.innerHTML="";
+downloadQRBtn.style.display="none";
+}
+
+/* GENERATE QR */
+function generateQR(){
+if(typeof QRCode==="undefined"){
+alert("QR library haijapakia. Angalia internet.");
+return;
+}
+
+let value="";
+const type=qrType.value;
+
+if(type==="url"||type==="text"){
+value=document.getElementById("qrInput").value.trim();
+}
+
+if(type==="whatsapp"){
+const number=document.getElementById("qrInput").value.replace(/\D/g,"");
+const message=document.getElementById("qrMessage").value;
+if(!number)return alert("Enter WhatsApp number");
+value="https://wa.me/"+number+(message?"?text="+encodeURIComponent(message):"");
+}
+
+if(type==="wifi"){
+const ssid=document.getElementById("wifiName").value;
+const pass=document.getElementById("wifiPassword").value;
+const security=document.getElementById("wifiSecurity").value;
+if(!ssid)return alert("Enter Wi-Fi name");
+const esc=s=>s.replace(/([\\;,:"'])/g,"\\$1");
+value="WIFI:T:"+security+";S:"+esc(ssid)+";P:"+esc(pass)+";;";
+}
+
+if(!value)return alert("Please enter your information");
+
+qrcode.innerHTML="";
+new QRCode(qrcode,{
+text:value,
+width:220,
+height:220,
+colorDark:qrColor.value,
+colorLight:qrBg.value,
+correctLevel:QRCode.CorrectLevel.H
+});
+downloadQRBtn.style.display="inline-block";
+}
+
+/* DOWNLOAD QR */
+function downloadQR(){
+const c=qrcode.querySelector("canvas");
+const img=qrcode.querySelector("img");
+const data=c?c.toDataURL("image/png"):img?img.src:"";
+if(!data)return alert("Generate QR first");
+const a=document.createElement("a");
+a.href=data;
+a.download="YASSER-TECH-QR.png";
+a.click();
+}
+
+/* SECURE RANDOM */
+function randomIndex(max){
+const n=new Uint32Array(1);
+const limit=Math.floor(4294967296/max)*max;
+let x;
+do{
+crypto.getRandomValues(n);
+x=n[0];
+}while(x>=limit);
+return x%max;
+}
+
+/* PASSWORD GENERATOR */
+function generatePassword(){
+const length=Math.max(8,Math.min(64,Number(passLength.value)||16));
+const sets=[];
+
+if(upper.checked)sets.push("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+if(lower.checked)sets.push("abcdefghijklmnopqrstuvwxyz");
+if(numbers.checked)sets.push("0123456789");
+if(symbols.checked)sets.push("!@#$%^&*()-_=+[]{}?");
+
+if(!sets.length)return alert("Choose at least one character type");
+
+const all=sets.join("");
+const chars=sets.map(set=>set[randomIndex(set.length)]);
+
+while(chars.length<length){
+chars.push(all[randomIndex(all.length)]);
+}
+
+for(let i=chars.length-1;i>0;i--){
+const j=randomIndex(i+1);
+[chars[i],chars[j]]=[chars[j],chars[i]];
+}
+
+passwordResult.textContent=chars.join("");
+
+strength.textContent=sets.length>=4&&length>=16
+?"STRONG PASSWORD"
+:sets.length>=3&&length>=12
+?"GOOD PASSWORD"
+:"BASIC PASSWORD";
+}
+
+/* COPY PASSWORD */
+async function copyPassword(){
+const value=passwordResult.textContent;
+if(value==="YOUR PASSWORD WILL APPEAR HERE"){
+return alert("Generate a password first");
+}
+try{
+await navigator.clipboard.writeText(value);
+alert("Password copied!");
+}catch(error){
+alert("Copy haikufanikiwa. Copy manually.");
+}
+}
+
+/* GLASS EFFECT */
+document.addEventListener("click",e=>{
+if(e.target.closest("input,textarea,select"))return;
+for(let i=0;i<6;i++){
+const s=document.createElement("span");
+s.className="shard";
+s.style.left=e.clientX+"px";
+s.style.top=e.clientY+"px";
+s.style.setProperty("--x",(Math.random()*120-60)+"px");
+s.style.setProperty("--y",(Math.random()*120-60)+"px");
+document.body.appendChild(s);
+setTimeout(()=>s.remove(),750);
+}
+});
+</script>
+</body>
+</html>
